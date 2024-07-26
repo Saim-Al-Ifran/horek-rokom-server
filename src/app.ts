@@ -6,6 +6,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
 import { nodeEnv } from './secret';
+import errorHandler from './errors/defaultError';
 
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
- 
+
+app.use(errorHandler);
+
 export default app;
  

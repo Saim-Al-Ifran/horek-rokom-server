@@ -10,12 +10,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bookService_1 = require("../../services/bookService");
+const fileUpload_1 = require("../../utils/fileUpload");
 class BookController {
     // Create a new book  
     addBook(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const bookData = req.body;
+                if (req.file) {
+                    const result = yield (0, fileUpload_1.uploadFileToCloudinary)(req.file);
+                    bookData.imageUrl = result.secure_url;
+                }
                 const savedBook = yield (0, bookService_1.createNewBook)(bookData);
                 res.status(201).json(savedBook);
             }
