@@ -4,10 +4,9 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { Request, Response, NextFunction } from 'express';
 import { nodeEnv } from './secret';
 import errorHandler from './errors/defaultError';
-
+import router from './routes/index';
 
 const app = express();
  
@@ -20,7 +19,7 @@ app.use(compression());
 app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
-
+app.use(router);
 
 app.use(errorHandler);
 
