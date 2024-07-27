@@ -1,14 +1,13 @@
 import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/User';
+import  { IUser } from '../models/User';
 import CustomError from '../errors/customError';
 import { secretKey } from '../secret';
 import { createNewUser, findUserByProperty } from './userService';
-import { handleAsyncError } from '../errors/errorUtils';
+
 
 export const registerUserService = async (userData: Partial<IUser>) => {
+
         const { username, email, password} = userData;
-
-
         if (!email) {
           throw new CustomError('Email is required', 400);
         }
@@ -20,11 +19,12 @@ export const registerUserService = async (userData: Partial<IUser>) => {
 
         const newUser = await createNewUser({ username, email, password });
         return newUser;
+
 };
 
 export const loginUserService = async (loginData: { email: string; password: string }) => {
-        const { email, password } = loginData;
 
+        const { email, password } = loginData;
         if (!email) {
           throw new CustomError('Email is required', 400);
         }
@@ -37,7 +37,6 @@ export const loginUserService = async (loginData: { email: string; password: str
           throw new CustomError('Invalid email or password', 401);
         }
         
-
         const isMatch = await user.matchPassword(password);
         if (!isMatch) {
           throw new CustomError('Invalid email or password', 401);
@@ -45,11 +44,12 @@ export const loginUserService = async (loginData: { email: string; password: str
 
         const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
         return token;
+
 };
 
 export const loginAdminService = async (loginData: { email: string; password: string }) => {
-  const { email, password } = loginData;
 
+  const { email, password } = loginData;
   const user = await findUserByProperty('email', email);
   console.log(user?.role !== 'admin');
   if (!user || user.role !== 'admin') {
@@ -63,4 +63,5 @@ export const loginAdminService = async (loginData: { email: string; password: st
 
   const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
   return token;
+
 };
