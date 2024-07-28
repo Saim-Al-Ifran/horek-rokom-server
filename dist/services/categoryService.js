@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCategoryById = exports.updateCategoryById = exports.createCategory = exports.getCategoryById = exports.getAllCategories = void 0;
 const Category_1 = __importDefault(require("../models/Category")); // Adjust the path as needed
 const customError_1 = __importDefault(require("../errors/customError"));
+const fileUpload_1 = require("../utils/fileUpload");
 const getAllCategories = () => __awaiter(void 0, void 0, void 0, function* () {
     const categories = yield Category_1.default.find();
     return categories;
@@ -28,12 +29,20 @@ const getCategoryById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return category;
 });
 exports.getCategoryById = getCategoryById;
-const createCategory = (categoryData) => __awaiter(void 0, void 0, void 0, function* () {
+const createCategory = (categoryData, imageFile) => __awaiter(void 0, void 0, void 0, function* () {
+    if (imageFile) {
+        const uploadResult = yield (0, fileUpload_1.uploadFileToCloudinary)(imageFile);
+        categoryData.imageUrl = uploadResult.secure_url;
+    }
     const category = new Category_1.default(categoryData);
     return yield category.save();
 });
 exports.createCategory = createCategory;
-const updateCategoryById = (id, categoryData) => __awaiter(void 0, void 0, void 0, function* () {
+const updateCategoryById = (id, categoryData, imageFile) => __awaiter(void 0, void 0, void 0, function* () {
+    if (imageFile) {
+        const uploadResult = yield (0, fileUpload_1.uploadFileToCloudinary)(imageFile);
+        categoryData.imageUrl = uploadResult.secure_url;
+    }
     const category = yield Category_1.default.findByIdAndUpdate(id, categoryData, { new: true, runValidators: true });
     if (!category) {
         throw new customError_1.default('Category not found', 404);

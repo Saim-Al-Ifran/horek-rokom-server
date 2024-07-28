@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
  
-interface ICategory extends Document {
+export interface ICategory extends Document {
     title: string;
     description: string;
     imageUrl?: string;
