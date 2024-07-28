@@ -1,24 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import CustomError from '../../errors/customError'; // Adjust the import path as needed
-import { secretKey } from '../../secret'; // Adjust the import path as needed
-import User from '../../models/User'; // Adjust the import path as needed
+import CustomError from '../../errors/customError'; 
+import { secretKey } from '../../secret'; 
+import { findUserByProperty } from '../../services/userService';
 
 interface DecodedToken {
     id: string;
 }
 
-const authenticate = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
-        const token = req.cookies.jwt;
+        const authHeader = req.headers.authorization;
+        let token = req.cookies.jwt || (authHeader && authHeader.split(' ')[1]);
 
         if (!token) {
             return next(new CustomError('Unauthorized', 403));
         }
-
-        // Verify token
         const decoded = jwt.verify(token, secretKey) as DecodedToken;
-        const user = await User.findById(decoded.id );
+        const user = await findUserByProperty('_id', decoded.id);
 
         if (!user) {
             return next(new CustomError('Unauthorized', 401));

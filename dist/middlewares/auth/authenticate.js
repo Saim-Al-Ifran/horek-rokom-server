@@ -13,18 +13,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const customError_1 = __importDefault(require("../../errors/customError")); // Adjust the import path as needed
-const secret_1 = require("../../secret"); // Adjust the import path as needed
-const User_1 = __importDefault(require("../../models/User")); // Adjust the import path as needed
-const authenticate = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const customError_1 = __importDefault(require("../../errors/customError"));
+const secret_1 = require("../../secret");
+const userService_1 = require("../../services/userService");
+const authenticate = (req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = req.cookies.jwt;
+        const authHeader = req.headers.authorization;
+        let token = req.cookies.jwt || (authHeader && authHeader.split(' ')[1]);
         if (!token) {
             return next(new customError_1.default('Unauthorized', 403));
         }
-        // Verify token
         const decoded = jsonwebtoken_1.default.verify(token, secret_1.secretKey);
-        const user = yield User_1.default.findById(decoded.id);
+        const user = yield (0, userService_1.findUserByProperty)('_id', decoded.id);
         if (!user) {
             return next(new customError_1.default('Unauthorized', 401));
         }

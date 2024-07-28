@@ -36,6 +36,7 @@ class AuthController {
             try {
                 const loginData = req.body;
                 const token = yield (0, authService_1.loginUserService)(loginData);
+                res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
                 res.status(200).json({ message: 'Login Successfull', token });
             }
             catch (error) {
@@ -49,6 +50,7 @@ class AuthController {
                 const loginData = req.body;
                 console.log(loginData);
                 const token = yield (0, authService_1.loginAdminService)(loginData);
+                res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
                 res.status(200).json({ token });
             }
             catch (error) {

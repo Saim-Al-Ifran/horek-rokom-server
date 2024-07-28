@@ -28,6 +28,7 @@ import CustomError from '../../../errors/customError';
 
       const loginData = req.body;
       const token = await loginUserService(loginData);
+      res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
       res.status(200).json({ message:'Login Successfull',token });
 
     }catch(error:any){
@@ -42,6 +43,7 @@ import CustomError from '../../../errors/customError';
       const loginData = req.body;
       console.log(loginData);
       const token = await loginAdminService(loginData);
+      res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
       res.status(200).json({ token });
 
     }catch(error:any){

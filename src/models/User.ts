@@ -4,8 +4,10 @@ import bcrypt from 'bcrypt';
 export interface IUser extends Document {
   username: string;
   email: string;
+  imageUrl:string;
   password: string;
   role: string;
+  isActive:boolean;
   matchPassword: (password: string) => Promise<boolean>;
 }
 
@@ -20,10 +22,18 @@ const userSchema: Schema<IUser> = new Schema({
     required: true,
     unique: true
   },
+  imageUrl:{
+    type: String,
+    default:'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+  },
   password: {
     type: String,
     required: true,
     minlength: 6 
+  },
+  isActive:{
+     type:Boolean,
+     default:true
   },
   role: {
     type: String,

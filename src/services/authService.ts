@@ -62,6 +62,7 @@ export const loginAdminService = async (loginData: { email: string; password: st
   }
 
   const token = jwt.sign({ id: user._id, role: user.role }, secretKey, { expiresIn: '1h' });
+  
   return token;
 
 };
