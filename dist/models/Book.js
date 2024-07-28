@@ -33,10 +33,6 @@ const BookSchema = new mongoose_1.Schema({
         type: String,
         required: true
     },
-    genre: {
-        type: String,
-        required: true
-    },
     description: {
         type: String,
         required: true
@@ -58,6 +54,11 @@ const BookSchema = new mongoose_1.Schema({
     },
     stockQuantity: {
         type: Number,
+        required: true
+    },
+    category: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: 'Category',
         required: true
     },
     createdAt: {

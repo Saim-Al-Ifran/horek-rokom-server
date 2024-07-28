@@ -10,6 +10,8 @@ import router from './routes/index';
 
 const app = express();
  
+app.use(cookieParser());
+app.use(express.json());
 if(nodeEnv !== 'production'){
     app.use(morgan('dev'));
 }
@@ -17,8 +19,6 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(compression());
 app.use(cors());
-app.use(cookieParser());
-app.use(express.json());
 app.use(router);
 
 app.use(errorHandler);

@@ -8,15 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const bookService_1 = require("../../services/bookService");
 const fileUpload_1 = require("../../utils/fileUpload");
+const customError_1 = __importDefault(require("../../errors/customError"));
+const delFileFromCloudinary_1 = require("../../utils/delFileFromCloudinary");
 class BookController {
     // Create a new book  
-    addBook(req, res) {
+    addBook(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const bookData = req.body;
+                console.log(req.body);
                 if (req.file) {
                     const result = yield (0, fileUpload_1.uploadFileToCloudinary)(req.file);
                     bookData.imageUrl = result.secure_url;
@@ -25,34 +31,24 @@ class BookController {
                 res.status(201).json(savedBook);
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ message: error.message });
-                }
-                else {
-                    res.status(500).json({ message: 'An unknown error occurred while creating the book.' });
-                }
+                next(new customError_1.default(error.message, error.status));
             }
         });
     }
     // Get all books 
-    getBooks(req, res) {
+    getBooks(_req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const books = yield (0, bookService_1.getAllBooks)();
                 res.status(200).json(books);
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ message: error.message });
-                }
-                else {
-                    res.status(500).json({ message: 'An unknown error occurred while fetching the books.' });
-                }
+                next(new customError_1.default(error.message, error.status));
             }
         });
     }
     // Get a book by ID
-    getBook(req, res) {
+    getBook(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const bookId = req.params.id;
@@ -61,25 +57,30 @@ class BookController {
                     res.status(200).json(book);
                 }
                 else {
-                    res.status(404).json({ message: 'Book not found' });
+                    next(new customError_1.default('Book not found', 404));
                 }
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ message: error.message });
-                }
-                else {
-                    res.status(500).json({ message: 'An unknown error occurred while fetching the book by ID.' });
-                }
+                next(new customError_1.default(error.message, error.status));
             }
         });
     }
     // Update a book by ID
-    updateBook(req, res) {
+    updateBook(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const bookId = req.params.id;
                 const bookData = req.body;
+                const imageFile = req.file;
+                if (imageFile) {
+                    const result = yield (0, fileUpload_1.uploadFileToCloudinary)(imageFile);
+                    bookData.imageUrl = result.secure_url;
+                    // If the book already has an imageUrl, delete the old one from Cloudinary
+                    const existingBook = yield (0, bookService_1.getBookById)(bookId);
+                    if (existingBook && existingBook.imageUrl) {
+                        yield (0, delFileFromCloudinary_1.deleteFileFromCloudinary)(existingBook.imageUrl);
+                    }
+                }
                 const updatedBook = yield (0, bookService_1.updateBookById)(bookId, bookData);
                 if (updatedBook) {
                     res.status(200).json(updatedBook);
@@ -89,35 +90,29 @@ class BookController {
                 }
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ message: error.message });
-                }
-                else {
-                    res.status(500).json({ message: 'An unknown error occurred while updating the book.' });
-                }
+                next(new customError_1.default(error.message, error.status));
             }
         });
     }
     // Delete a book by ID
-    deleteBook(req, res) {
+    deleteBook(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const bookId = req.params.id;
+                const book = yield (0, bookService_1.getBookById)(bookId);
+                if (book && book.imageUrl) {
+                    yield (0, delFileFromCloudinary_1.deleteFileFromCloudinary)(book.imageUrl);
+                }
                 const deletedBook = yield (0, bookService_1.deleteBookById)(bookId);
                 if (deletedBook) {
                     res.status(200).json({ message: 'Book deleted successfully' });
                 }
                 else {
-                    res.status(404).json({ message: 'Book not found' });
+                    next(new customError_1.default('Book not found', 404));
                 }
             }
             catch (error) {
-                if (error instanceof Error) {
-                    res.status(500).json({ message: error.message });
-                }
-                else {
-                    res.status(500).json({ message: 'An unknown error occurred while deleting the book.' });
-                }
+                next(new customError_1.default(error.message, error.status));
             }
         });
     }

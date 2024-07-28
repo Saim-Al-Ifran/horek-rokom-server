@@ -42,7 +42,7 @@ class CategoryController {
     }
   }
 
- public async updateCategory(req: Request, res: Response,next:NextFunction): Promise<void> {
+ public async updateCategory(req: Request, res: Response, next:NextFunction): Promise<void> {
     try {
       const categoryId = req.params.id;
       const categoryData = req.body;

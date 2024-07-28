@@ -1,30 +1,25 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
- 
 export interface IBook extends Document {
     title: string;
     author: string;
-    genre: string;
     description: string;
     price: number;
     imageUrl?: string;
     publicationDate: Date;
     rating: number;
     stockQuantity: number;
+    category: mongoose.Schema.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
- 
+
 const BookSchema = new Schema<IBook>({
     title: {
         type: String,
         required: true
     },
     author: {
-        type: String,
-        required: true
-    },
-    genre: {
         type: String,
         required: true
     },
@@ -51,6 +46,11 @@ const BookSchema = new Schema<IBook>({
         type: Number,
         required: true
     },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
     createdAt: {
         type: Date,
         default: Date.now,
@@ -63,7 +63,7 @@ const BookSchema = new Schema<IBook>({
     }
 });
 
- 
 const Book = mongoose.model<IBook>('Book', BookSchema);
 
 export default Book;
+

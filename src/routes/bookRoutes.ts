@@ -1,12 +1,17 @@
 // routes/bookRoutes.ts
 import express from 'express';
 import BookController from '../controllers/book/bookController';
+import authenticate from '../middlewares/auth/authenticate';
+import authorizeAdmin from '../middlewares/auth/authorizeAdmin';
+import upload from '../middlewares/uploadFile/upload';
 const router = express.Router();
 
 router.get('/books', BookController.getBooks);
 router.get('/books/:id', BookController.getBook);
-router.post('/books', BookController.addBook);
-router.put('/books/:id', BookController.updateBook);
-router.delete('/books/:id', BookController.deleteBook);
+
+//routes for admin 
+router.post('/books', authenticate, authorizeAdmin ,upload.single('image'), BookController.addBook);
+router.put('/books/:id', authenticate, authorizeAdmin ,upload.single('image') ,BookController.updateBook);
+router.delete('/books/:id', authenticate, authorizeAdmin , BookController.deleteBook);
 
 export default router;
