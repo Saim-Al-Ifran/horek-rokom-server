@@ -10,6 +10,9 @@ import {
 import { uploadFileToCloudinary } from '../../utils/fileUpload';
 import CustomError from '../../errors/customError';
 import { deleteFileFromCloudinary } from '../../utils/delFileFromCloudinary';
+import paginate from '../../utils/paginate';
+import Book from '../../models/Book';
+import { SortOrder } from 'mongoose';
 
 class BookController {
 
@@ -35,16 +38,48 @@ class BookController {
   }
 
   // Get all books 
-  public async getBooks(_req: Request, res: Response, next:NextFunction): Promise<void> {
+  public async getBooks(req: any, res: Response, next: NextFunction): Promise<void> {
     try {
-      const books = await getAllBooks();
+      const { author, title, search, sortBy } = req.query; 
+      const { page, limit } = req.pagination!;
+  
+      const query: any = {}; // Initialize query object
+  
+      // Add filters to the query object
+      if (author) {
+        query.author = author;
+      }
+      if (title) {
+        query.title = { $regex: new RegExp(title as string, 'i') };
+      } else if (search) {
+        // General search across multiple fields
+        query.$or = [
+          { title: { $regex: new RegExp(search as string, 'i') } },
+          { author: { $regex: new RegExp(search as string, 'i') } },
+          { description: { $regex: new RegExp(search as string, 'i') } },
+        ];
+      }
+  
+      // Define sorting options
+      const sort: Record<string, SortOrder> = {};
+      if (sortBy === 'price_asc') {
+        sort.price = 1;
+      } else if (sortBy === 'price_desc') {
+        sort.price = -1;
+      } else if (sortBy === 'rating_asc') {
+        sort.rating = 1;
+      } else if (sortBy === 'rating_desc') {
+        sort.rating = -1;
+      }
+  
+      // Paginate and sort the results
+      const books = await paginate(Book, query, page, limit, sort);
       res.status(200).json(books);
-    }catch (error:any) {
-      next(new CustomError(error.message,error.status))
-
+  
+    } catch (error: any) {
+      next(new CustomError(error.message, error.status || 500));
     }
   }
-
   // Get a book by ID
   public async getBook(req: Request, res: Response ,next:NextFunction): Promise<void> {
     try {

@@ -16,6 +16,8 @@ const bookService_1 = require("../../services/bookService");
 const fileUpload_1 = require("../../utils/fileUpload");
 const customError_1 = __importDefault(require("../../errors/customError"));
 const delFileFromCloudinary_1 = require("../../utils/delFileFromCloudinary");
+const paginate_1 = __importDefault(require("../../utils/paginate"));
+const Book_1 = __importDefault(require("../../models/Book"));
 class BookController {
     // Create a new book  
     addBook(req, res, next) {
@@ -36,14 +38,47 @@ class BookController {
         });
     }
     // Get all books 
-    getBooks(_req, res, next) {
+    getBooks(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const books = yield (0, bookService_1.getAllBooks)();
+                const { author, title, search, sortBy } = req.query;
+                const { page, limit } = req.pagination;
+                const query = {}; // Initialize query object
+                // Add filters to the query object
+                if (author) {
+                    query.author = author;
+                }
+                if (title) {
+                    query.title = { $regex: new RegExp(title, 'i') };
+                }
+                else if (search) {
+                    // General search across multiple fields
+                    query.$or = [
+                        { title: { $regex: new RegExp(search, 'i') } },
+                        { author: { $regex: new RegExp(search, 'i') } },
+                        { description: { $regex: new RegExp(search, 'i') } },
+                    ];
+                }
+                // Define sorting options
+                const sort = {};
+                if (sortBy === 'price_asc') {
+                    sort.price = 1;
+                }
+                else if (sortBy === 'price_desc') {
+                    sort.price = -1;
+                }
+                else if (sortBy === 'rating_asc') {
+                    sort.rating = 1;
+                }
+                else if (sortBy === 'rating_desc') {
+                    sort.rating = -1;
+                }
+                // Paginate and sort the results
+                const books = yield (0, paginate_1.default)(Book_1.default, query, page, limit, sort);
                 res.status(200).json(books);
             }
             catch (error) {
-                next(new customError_1.default(error.message, error.status));
+                next(new customError_1.default(error.message, error.status || 500));
             }
         });
     }

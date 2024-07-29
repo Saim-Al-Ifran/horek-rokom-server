@@ -9,8 +9,9 @@ const bookController_1 = __importDefault(require("../controllers/book/bookContro
 const authenticate_1 = __importDefault(require("../middlewares/auth/authenticate"));
 const authorizeAdmin_1 = __importDefault(require("../middlewares/auth/authorizeAdmin"));
 const upload_1 = __importDefault(require("../middlewares/uploadFile/upload"));
+const paginationMiddleware_1 = __importDefault(require("../middlewares/paginationMiddleware"));
 const router = express_1.default.Router();
-router.get('/books', bookController_1.default.getBooks);
+router.get('/books', paginationMiddleware_1.default, bookController_1.default.getBooks);
 router.get('/books/:id', bookController_1.default.getBook);
 //routes for admin 
 router.post('/books', authenticate_1.default, authorizeAdmin_1.default, upload_1.default.single('image'), bookController_1.default.addBook);

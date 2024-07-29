@@ -14,7 +14,7 @@ import { uploadFileToCloudinary } from '../../utils/fileUpload';
 
 class UserController {
 
- public async getUserProfile(req:any, res: Response): Promise<void> {
+    public async getUserProfile(req:any, res: Response): Promise<void> {
         try {
           const userId = req.user.id;
           const user = await findUserByProperty('_id',userId);
