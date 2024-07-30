@@ -1,6 +1,11 @@
 import mongoose, { Document, Schema, CallbackError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
+interface IRefreshToken {
+  token: string;
+}
+
+
 export interface IUser extends Document {
   username: string;
   email: string;
@@ -8,6 +13,7 @@ export interface IUser extends Document {
   password: string;
   role: string;
   isActive:boolean;
+  refreshTokens: IRefreshToken[];
   matchPassword: (password: string) => Promise<boolean>;
 }
 
@@ -39,7 +45,12 @@ const userSchema: Schema<IUser> = new Schema({
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
-  }
+  },
+  refreshTokens: [
+    {
+     token: String,
+    }
+  ]
 });
 
 userSchema.pre<IUser>('save', async function (next: (err?: CallbackError) => void) {

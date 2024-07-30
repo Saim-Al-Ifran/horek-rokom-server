@@ -35,9 +35,10 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const loginData = req.body;
-                const token = yield (0, authService_1.loginUserService)(loginData);
-                res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-                res.status(200).json({ message: 'Login Successfull', token });
+                const { accessToken, refreshToken } = yield (0, authService_1.loginUserService)(loginData);
+                res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+                res.status(200).json({ message: 'Login Successfull', accessToken, refreshToken });
             }
             catch (error) {
                 next(new customError_1.default(error.message, error.status));
@@ -48,10 +49,27 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const loginData = req.body;
-                console.log(loginData);
-                const token = yield (0, authService_1.loginAdminService)(loginData);
-                res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
-                res.status(200).json({ token });
+                const { accessToken, refreshToken } = yield (0, authService_1.loginAdminService)(loginData);
+                res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 3600000 });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+                res.status(200).json({ message: 'Login Successfull', accessToken, refreshToken });
+            }
+            catch (error) {
+                next(new customError_1.default(error.message, error.status));
+            }
+        });
+    }
+    refreshTokenController(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { refreshToken } = req.cookies;
+                if (!refreshToken) {
+                    throw new customError_1.default('Refresh token not provided', 403);
+                }
+                const tokens = yield (0, authService_1.refreshTokenService)(refreshToken);
+                res.cookie('accessToken', tokens.accessToken, { httpOnly: true, maxAge: 3600000 });
+                res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+                res.json(tokens);
             }
             catch (error) {
                 next(new customError_1.default(error.message, error.status));

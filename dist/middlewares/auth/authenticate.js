@@ -19,7 +19,8 @@ const userService_1 = require("../../services/userService");
 const authenticate = (req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const authHeader = req.headers.authorization;
-        let token = req.cookies.jwt || (authHeader && authHeader.split(' ')[1]);
+        let token = req.cookies.accessToken || (authHeader && authHeader.split(' ')[1]);
+        console.log(token);
         if (!token) {
             return next(new customError_1.default('Unauthorized', 403));
         }

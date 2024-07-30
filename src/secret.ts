@@ -5,6 +5,7 @@ const {
   MONGODB_URL,
   NODE_ENV,
   JWT_SECRET_KEY,
+  JWT_REFRESH_SECRET_KEY,
   CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET_KEY
@@ -28,10 +29,14 @@ if (!CLOUDINARY_API_KEY) {
 if (!CLOUDINARY_API_SECRET_KEY) {
   throw new Error('Missing CLOUDINARY_API_SECRET_KEY environment variable');
 }
+if(!JWT_REFRESH_SECRET_KEY){
+  throw new Error('Missing CLOUDINARY_API_SECRET_KEY environment variable');
+}
 
 export const mongoDbUrl = MONGODB_URL;
 export const nodeEnv = NODE_ENV;
 export const secretKey = JWT_SECRET_KEY;
+export const refreshSecretKey = JWT_SECRET_KEY;
 export const cloudinaryCloudName = CLOUDINARY_CLOUD_NAME;
 export const cloudinaryApiKey = CLOUDINARY_API_KEY;
 export const cloudinarySecretKey = CLOUDINARY_API_SECRET_KEY;

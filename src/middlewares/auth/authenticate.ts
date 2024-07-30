@@ -11,8 +11,9 @@ interface DecodedToken {
 const authenticate = async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     try {
         const authHeader = req.headers.authorization;
-        let token = req.cookies.jwt || (authHeader && authHeader.split(' ')[1]);
-
+        let token = req.cookies.accessToken || (authHeader && authHeader.split(' ')[1]);
+          console.log(token);
+          
         if (!token) {
             return next(new CustomError('Unauthorized', 403));
         }

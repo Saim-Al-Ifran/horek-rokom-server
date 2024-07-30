@@ -12,4 +12,6 @@ router.post('/login', AuthController.loginUser);
 // Admin Login
 router.post('/admin/login', AuthController.loginAdmin);
 
+router.post('/refresh-token', AuthController.refreshTokenController);
+
 export default router;
