@@ -1,0 +1,675 @@
+openapi: 3.0.0
+info:
+  title: Horek-rokom API Documentation
+  version: 1.0.0
+  description: API documentation for Horek-rokom, a platform for book selling.
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+tags:
+  - name: Authentication
+    description: Endpoints related to user authentication and authorization
+  - name: User
+    description: Endpoints for managing users
+  - name: Category
+    description: Endpoints for managing book categories
+  - name: Book
+    description: Endpoints for managing books
+paths:
+  /api/v1/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Register a new user with the provided username, email, and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: kvicha
+                email:
+                  type: string
+                  example: k34@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: kvicha
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 12345
+                  username:
+                    type: string
+                    example: kvicha
+                  email:
+                    type: string
+                    example: k34@gmail.com
+        '400':
+          description: Bad Request - Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid input data"
+  /api/v1/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticate a user using their email and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: ff44@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: montuMia
+      responses:
+        '200':
+          description: User successfully authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login Successfull"
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken:
+                    type: string
+                    example: "xyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid email or password"
+  /api/v1/auth/admin/login:
+    post:
+      tags:
+        - Authentication
+      summary: Admin  login
+      description: Authenticate a user using their email and password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: ff44@gmail.com
+                password:
+                  type: string
+                  format: password
+                  example: montuMia
+      responses:
+        '200':
+          description: User successfully authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login Successfull"
+                  accessToken:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken:
+                    type: string
+                    example: "xyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid email or password"
+ 
+  /api/v1/users:
+    get:
+      tags:
+        - User
+      summary: Get all users (Admin only)
+      description: Retrieve a list of all users. Only accessible by admin users.
+      responses:
+        '200':
+          description: Successfully retrieved list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 12345
+                    username:
+                      type: string
+                      example: kvicha
+                    email:
+                      type: string
+                      example: k34@gmail.com
+                    role:
+                      type: string
+                      example: user
+  /api/v1/user/{userId}/deactivate:
+    patch:
+      tags:
+        - User
+      summary: Deactivate a user (Admin only)
+      description: Deactivate a specific user by their ID. Only accessible by admin users.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 66a517fe6937df2735a70a44
+      responses:
+        '200':
+          description: User successfully deactivated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User has been deactivated"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+  /api/v1/user/{userId}/role:
+     patch:
+      tags:
+        - User
+      summary: Update user role (Admin only)
+      description: Update the role of a specific user by their ID. Only accessible by admin users.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 66a517fe6937df2735a70a44
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  example: admin
+      responses:
+        '200':
+          description: User role successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User role has been updated"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+  /api/v1/user/{userId}:
+    put:
+      tags:
+        - User
+      summary: Update user information
+      description: Update the email or other details of a specific user by their ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 66a517fe6937df2735a70a44
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: hridoykhan@gmail.com
+      responses:
+        '200':
+          description: User information successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User information has been updated"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+  
+    delete:
+      tags:
+        - User
+      summary: Delete user (Admin only)
+      description: Delete a specific user by their ID. Only accessible by admin users.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 66a5d3c8b47a66723acef64c
+      responses:
+        '200':
+          description: User successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User has been deleted"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+  /api/v1/user/profile:
+    get:
+      tags:
+        - User
+      summary: Get user profile
+      description: Retrieves the profile information of the currently authenticated user.
+      responses:
+        '200':
+          description: Successful operation - User profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 66a517fe6937df2735a70a44
+                  username:
+                    type: string
+                    example: kvicha
+                  email:
+                    type: string
+                    format: email
+                    example: k34@gmail.com
+                  role:
+                    type: string
+                    example: user
+                  image:
+                    type: string
+                    example: "https://dummyimage.com/600x400/000/fff"
+  /api/v1/user/profile/image:
+    patch:
+      tags:
+        - User
+      summary: Update profile picture
+      description: Allows the user to update their profile picture.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Profile picture updated successfully
+  /api/v1/category:
+     post:
+      tags:
+        - Category
+      summary: Create a new category (Admin only)
+      description: Allows an admin to create a new book category.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - image
+              properties:
+                title:
+                  type: string
+                  example: Computer Science
+                description:
+                  type: string
+                  example: Books related to computer science and programming
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Category created successfully
+        '400':
+          description: Bad Request - Invalid input data
+  /api/v1/categories:
+    get:
+      tags:
+        - Category
+      summary: Get all categories
+      description: Retrieves a list of all book categories.
+      responses:
+        '200':
+          description: Successful operation - List of categories retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 66a60b2c1f6ac38ef14d437e
+                    title:
+                      type: string
+                      example: Science Fiction
+                    description:
+                      type: string
+                      example: Books related to science fiction genre
+ 
+  /api/v1/categories/{categoryId}:
+    get:
+      tags:
+        - Category
+      summary: Get a single category by ID
+      description: Fetches details of a specific book category by its unique ID.
+      parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: 66a60b2c1f6ac38ef14d437e
+      responses:
+        '200':
+           description: Successful response with the category details
+           content:
+              application/json:
+                 schema:
+                   type: object
+                   properties:
+                      _id:
+                        type: string
+                        example: 66a60b2c1f6ac38ef14d437e
+                      title:
+                        type: string
+                        example: Fantasy
+                      description:
+                        type: string
+                        example: Books related to the fantasy genre
+    put:
+      tags:
+        - Category
+      summary: Update category (Admin only)
+      description: Updates the details of a specific book category.
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 66a60b2c1f6ac38ef14d437e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Fantasy
+                description:
+                  type: string
+                  example: Books related to fantasy genre
+      responses:
+        '200':
+          description: Category updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Category updated successfully
+        '404':
+          description: Not Found - Category does not exist
+    delete:
+      tags:
+        - Category
+      summary: Delete a category (Admin only)
+      description: Deletes a specific book category. Accessible only by admins.
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 66a60b2c1f6ac38ef14d437e
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Category deleted successfully
+        '404':
+          description: Not Found - Category does not exist
+  
+  /api/v1/books:
+    post:
+      tags:
+        - Book
+      summary: add-book
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Pride and Prejudice
+                author:
+                  type: string
+                  example: Jane Austen
+                description:
+                  type: string
+                  example: >-
+                    A classic novel about the manners and matrimonial
+                    machinations among the British gentry of the early 19th
+                    century.
+                price:
+                  type: integer
+                  example: '49'
+                image:
+                  type: string
+                  format: binary
+                publicationDate:
+                  type: string
+                  example: '1813-01-28T00:00:00.000Z'
+                rating:
+                  type: number
+                  example: '4.5'
+                stockQuantity:
+                  type: integer
+                  example: '15'
+                category:
+                  type: string
+                  example: 66a60b2c1f6ac38ef14d437e
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    get:
+      tags:
+        - Book
+      summary: get-all-books
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /api/v1/books/66a63cd3ab4b13397a6b0047:
+    get:
+      tags:
+        - Book
+      summary: get-single-book
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - Book
+      summary: update-book
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Book
+      summary: delete-book
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
