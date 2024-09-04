@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   description: API documentation for Horek-rokom, a platform for book selling.
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:4000
     description: Local development server
 tags:
   - name: Authentication
@@ -579,7 +579,7 @@ paths:
     post:
       tags:
         - Book
-      summary: add-book
+      summary: add-book(Admin only)
       requestBody:
         content:
           multipart/form-data:
@@ -623,53 +623,285 @@ paths:
             type: string
           example: application/json
       responses:
-        '200':
-          description: Successful response
+        '201':
+          description: Book created successfully
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book created successfully
+                  bookId:
+                    type: string
+                    example: 64d8f3b5d1f3c3f8f2d5c2e7
+    get:
+     tags:
+      - Book
+     summary: Get all books with pagination, sorting, and filtering
+     parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Page number for pagination
+        example: 1
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Number of books per page
+        example: 10
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+            - price_asc
+            - price_desc
+            - rating_asc
+            - rating_desc
+        description: Sort by price or rating
+        example: price,-rating
+      - name: title
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by book title
+        example: Pride and Prejudice
+      - name: author
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Filter by author name
+        example: Jane Austen
+     responses:
+      '200':
+        description: A list of books with pagination, sorting, and filtering
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                totalItems:
+                  type: integer
+                  example: 100
+                totalPages:
+                  type: integer
+                  example: 10
+                currentPage:
+                  type: integer
+                  example: 1
+                books:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 64d8f3b5d1f3c3f8f2d5c2e7
+                      title:
+                        type: string
+                        example: Pride and Prejudice
+                      author:
+                        type: string
+                        example: Jane Austen
+                      description:
+                        type: string
+                        example: >-
+                          A classic novel about the manners and matrimonial
+                          machinations among the British gentry of the early 19th
+                          century.
+                      price:
+                        type: integer
+                        example: 49
+                      publicationDate:
+                        type: string
+                        format: date
+                        example: '1813-01-28'
+                      rating:
+                        type: number
+                        format: float
+                        example: 4.5
+                      stockQuantity:
+                        type: integer
+                        example: 15
+                      category:
+                        type: string
+                        example: 66a60b2c1f6ac38ef14d437e
+  /api/v1/books/{bookId}:
     get:
       tags:
         - Book
-      summary: get-all-books
+      summary: Get a single book by ID
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the book to retrieve
+          example: 64d8f3b5d1f3c3f8f2d5c2e7
       responses:
         '200':
-          description: Successful response
+          description: Successful retrieval of book details
           content:
-            application/json: {}
-  /api/v1/books/66a63cd3ab4b13397a6b0047:
-    get:
-      tags:
-        - Book
-      summary: get-single-book
-      responses:
-        '200':
-          description: Successful response
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: 64d8f3b5d1f3c3f8f2d5c2e7
+                  title:
+                    type: string
+                    example: Pride and Prejudice
+                  author:
+                    type: string
+                    example: Jane Austen
+                  description:
+                    type: string
+                    example: >-
+                      A classic novel about the manners and matrimonial
+                      machinations among the British gentry of the early 19th
+                      century.
+                  price:
+                    type: integer
+                    example: 49
+                  publicationDate:
+                    type: string
+                    format: date
+                    example: '1813-01-28'
+                  rating:
+                    type: number
+                    format: float
+                    example: 4.5
+                  stockQuantity:
+                    type: integer
+                    example: 15
+                  category:
+                    type: string
+                    example: 66a60b2c1f6ac38ef14d437e
+        '404':
+          description: Book not found
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book not found
     put:
       tags:
         - Book
-      summary: update-book
+      summary: Update a book by ID
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the book to update
+          example: 64d8f3b5d1f3c3f8f2d5c2e7
       requestBody:
         content:
           multipart/form-data:
             schema:
               type: object
               properties:
+                title:
+                  type: string
+                  example: Pride and Prejudice
+                author:
+                  type: string
+                  example: Jane Austen
+                description:
+                  type: string
+                  example: >-
+                    A classic novel about the manners and matrimonial
+                    machinations among the British gentry of the early 19th
+                    century.
+                price:
+                  type: integer
+                  example: 49
                 image:
                   type: string
                   format: binary
+                publicationDate:
+                  type: string
+                  format: date
+                  example: '1813-01-28'
+                rating:
+                  type: number
+                  format: float
+                  example: 4.5
+                stockQuantity:
+                  type: integer
+                  example: 15
+                category:
+                  type: string
+                  example: 66a60b2c1f6ac38ef14d437e
       responses:
         '200':
-          description: Successful response
+          description: Book updated successfully
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book updated successfully
+                  bookId:
+                    type: string
+                    example: 64d8f3b5d1f3c3f8f2d5c2e7
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book not found
     delete:
       tags:
         - Book
-      summary: delete-book
+      summary: Delete a book by ID
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the book to delete
+          example: 64d8f3b5d1f3c3f8f2d5c2e7
       responses:
         '200':
-          description: Successful response
+          description: Book deleted successfully
           content:
-            application/json: {}
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book deleted successfully
+        '404':
+          description: Book not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Book not found
