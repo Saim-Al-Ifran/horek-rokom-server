@@ -21,7 +21,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 if(nodeEnv !== 'production'){
     app.use(morgan('dev'));
 }
-app.use(morgan('dev'));
 app.use(helmet());
 app.use(compression());
 app.use(cors());
