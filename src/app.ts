@@ -10,7 +10,6 @@ import YAML from 'yamljs';
 import swaggerUi from 'swagger-ui-express';
 import path from 'path';
 import router from './routes/index';
-
 const swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yaml')); 
 
 const app = express();
@@ -18,9 +17,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-if(nodeEnv === 'development'){
-    app.use(morgan('dev'));
-}
+ 
 app.use(helmet());
 app.use(compression());
 app.use(cors());
